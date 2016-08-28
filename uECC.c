@@ -1303,6 +1303,35 @@ static int uECC_sign_with_k(const uint8_t *private_key,
     return 1;
 }
 
+
+
+/* XXX */
+void rfc6979sha256p256sign(const uint8_t *private_key, const uint8_t *message_hash, uint8_t *signature)
+{
+    uint8_t ephemeral_key[32];
+    uECC_word_t k[uECC_MAX_WORDS];
+
+    {
+        int i;
+        uint8_t entropy_for_k[64];
+        uint8_t state_for_k[64];
+        for (i = 0; i < 32; ++i) {
+            entropy_for_k[i] = private_key[i];
+        }
+        for (i = 0; i < 32; ++i) {
+            entropy_for_k[32 + i] = message_hash[i];
+        }
+        rfc6979sha256p256csprng_init(state_for_k, entropy_for_k, 64);
+        rfc6979sha256p256csprng_gen(state_for_k, ephemeral_key);
+    }
+
+    uECC_vli_bytesToNative(k, ephemeral_key, 32);
+
+    uECC_sign_with_k(private_key, message_hash, 32, k, signature, uECC_secp256r1());
+}
+
+
+
 int uECC_sign(const uint8_t *private_key,
               const uint8_t *message_hash,
               unsigned hash_size,

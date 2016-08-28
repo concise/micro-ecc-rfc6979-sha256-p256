@@ -4,6 +4,7 @@
 #define _UECC_H_
 
 #include <stdint.h>
+#include "rfc6979sha256p256csprng.h"
 
 /* Platform selection options.
 If uECC_PLATFORM is not defined, the code will try to guess it based on compiler macros.
@@ -38,12 +39,12 @@ faster somewhat faster, but increases the code size. */
 #endif
 
 /* uECC_VLI_NATIVE_LITTLE_ENDIAN - If enabled (defined as nonzero), this will switch to native
-little-endian format for *all* arrays passed in and out of the public API. This includes public 
-and private keys, shared secrets, signatures and message hashes. 
+little-endian format for *all* arrays passed in and out of the public API. This includes public
+and private keys, shared secrets, signatures and message hashes.
 Using this switch reduces the amount of call stack memory used by uECC, since less intermediate
-translations are required. 
+translations are required.
 Note that this will *only* work on native little-endian processors and it will treat the uint8_t
-arrays passed into the public API as word arrays, therefore requiring the provided byte arrays 
+arrays passed into the public API as word arrays, therefore requiring the provided byte arrays
 to be word aligned on architectures that do not support unaligned accesses. */
 #ifndef uECC_VLI_NATIVE_LITTLE_ENDIAN
     #define uECC_VLI_NATIVE_LITTLE_ENDIAN 0
@@ -51,25 +52,25 @@ to be word aligned on architectures that do not support unaligned accesses. */
 
 /* Curve support selection. Set to 0 to remove that curve. */
 #ifndef uECC_SUPPORTS_secp160r1
-    #define uECC_SUPPORTS_secp160r1 1
+    #define uECC_SUPPORTS_secp160r1 0
 #endif
 #ifndef uECC_SUPPORTS_secp192r1
-    #define uECC_SUPPORTS_secp192r1 1
+    #define uECC_SUPPORTS_secp192r1 0
 #endif
 #ifndef uECC_SUPPORTS_secp224r1
-    #define uECC_SUPPORTS_secp224r1 1
+    #define uECC_SUPPORTS_secp224r1 0
 #endif
 #ifndef uECC_SUPPORTS_secp256r1
     #define uECC_SUPPORTS_secp256r1 1
 #endif
 #ifndef uECC_SUPPORTS_secp256k1
-    #define uECC_SUPPORTS_secp256k1 1
+    #define uECC_SUPPORTS_secp256k1 0
 #endif
 
 /* Specifies whether compressed point format is supported.
    Set to 0 to disable point compression/decompression functions. */
 #ifndef uECC_SUPPORT_COMPRESSED_POINT
-    #define uECC_SUPPORT_COMPRESSED_POINT 1
+    #define uECC_SUPPORT_COMPRESSED_POINT 0
 #endif
 
 struct uECC_Curve_t;
@@ -95,6 +96,13 @@ uECC_Curve uECC_secp256r1(void);
 #if uECC_SUPPORTS_secp256k1
 uECC_Curve uECC_secp256k1(void);
 #endif
+
+
+
+/* XXX */
+void rfc6979sha256p256sign(const uint8_t *private_key, const uint8_t *message_hash, uint8_t *signature);
+
+
 
 /* uECC_RNG_Function type
 The RNG function should fill 'size' random bytes into 'dest'. It should return 1 if
